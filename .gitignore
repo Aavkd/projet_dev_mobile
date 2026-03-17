@@ -32,3 +32,10 @@ vite.config.js.timestamp-*
 .env
 .env.*
 !.env.example
+
+# Expo mobile app
+mobile/.expo/
+mobile/.expo-shared/
+mobile/node_modules/
+mobile/dist/
+mobile/web-build/

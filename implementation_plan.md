@@ -370,3 +370,48 @@ graph TD
 13. **Merchant**: dashboard shows updated stats (1 order, correct revenue)
 14. **Client**: attempt to add out-of-stock product → button disabled
 15. **Notifications**: verify bell shows unread count, toast appears on new notification
+
+---
+
+## Phase 8 — Mobile (Expo Go) Parallel App
+
+### [DONE] Mobile workspace scaffold
+- Added `mobile/` Expo app (parallel to existing Vite web app)
+- Kept web app unchanged to avoid regressions during mobile migration
+- Added root scripts:
+    - `npm run dev:web`
+    - `npm run dev:mobile`
+    - `npm run android`
+
+### [DONE] Expo runtime compatibility
+- Upgraded mobile setup to Expo SDK 54 compatibility (matches current Expo Go)
+- Added mobile env contract in `mobile/.env.example` using `EXPO_PUBLIC_*`
+- Added concrete mobile config in `mobile/.env` (mirrors root Appwrite values)
+- Added `mobile/README.md` with install and run steps
+
+### [PARTIAL] Auth baseline for phone launch
+- Implemented Appwrite client bootstrap in `mobile/src/lib/appwrite.js`
+- Added mobile auth context in `mobile/src/contexts/AuthContext.jsx`
+- Added mobile auth screens:
+    - `mobile/app/(auth)/login.jsx`
+    - `mobile/app/(auth)/register.jsx`
+- Added role shell screens:
+    - `mobile/app/(app)/client.jsx`
+    - `mobile/app/(app)/merchant.jsx`
+
+### [OPEN BLOCKER] Session switching/login reliability
+- Merchant login is working on device.
+- Client login is currently blocked in some cases with Appwrite error:
+  - `Creation of a session is prohibited when a session is active.`
+- Mobile auth flow still needs explicit account/session switching logic before full parity testing.
+
+### Remaining implementation steps
+1. Fix mobile auth session switching:
+   - Detect active session and allow safe user switching (`deleteSession('current')` before new login when needed).
+   - Validate merchant/client switching flows on physical phone.
+2. Port client flow pages (`catalog`, `product detail`, `cart`, `orders`, `addresses`, `confirmation`) to Expo screens.
+3. Port merchant flow pages (`dashboard`, `products`, `categories`, `order queue`, `history`, `schedule`) to Expo screens.
+4. Replace web-only storage in shared logic with mobile adapters (AsyncStorage/SecureStore).
+5. Port product image upload flow using Expo Image Picker + File System.
+6. Port realtime + notifications UI for mobile and validate channels on device.
+7. Execute complete mobile E2E parity checks for both roles.

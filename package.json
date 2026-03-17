@@ -5,6 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:web": "vite",
+    "dev:mobile": "npm --prefix mobile run start",
+    "android": "npm --prefix mobile run android",
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest run",
