@@ -3,11 +3,13 @@ import { Link } from 'expo-router'
 import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native'
 import { APPWRITE_DATABASE_ID, COLLECTIONS } from '../../../../src/lib/env'
 import { useAuth } from '../../../../src/contexts/AuthContext'
+import { useTheme } from '../../../../src/theme/ThemeProvider'
 import { orderService } from '../../../../src/services/orderService'
 import { useRealtime } from '../../../../src/hooks/useRealtime'
 
 export default function ClientOrdersScreen() {
   const { user } = useAuth()
+  const { colors, radius, spacing, typography } = useTheme()
   const [orders, setOrders] = useState([])
   const [loading, setLoading] = useState(true)
 
@@ -46,30 +48,63 @@ export default function ClientOrdersScreen() {
 
   if (loading) {
     return (
-      <View style={styles.loaderBox}>
-        <ActivityIndicator size="large" color="#1f6feb" />
+      <View style={[styles.loaderBox, { backgroundColor: colors.background }]}> 
+        <ActivityIndicator size="large" color={colors.primary} />
+        <Text style={[styles.loaderText, { color: colors.textMuted }]}>Loading your orders...</Text>
       </View>
     )
   }
 
   return (
-    <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
-      <Text style={styles.title}>My orders</Text>
-      {orders.length === 0 ? <Text style={styles.meta}>No orders yet</Text> : null}
+    <ScrollView style={[styles.screen, { backgroundColor: colors.background }]} contentContainerStyle={[styles.content, { padding: spacing.md, gap: spacing.sm }]}> 
+      <View style={[styles.hero, { borderRadius: radius.lg, borderColor: colors.border, backgroundColor: colors.primarySoft, padding: spacing.md }]}> 
+        <Text style={[styles.title, { color: colors.text, fontSize: typography.titleM }]}>My orders</Text>
+        <Text style={[styles.heroMeta, { color: colors.textMuted }]}>Track progress from preparation to pickup.</Text>
+      </View>
+
+      {orders.length === 0 ? (
+        <View style={[styles.emptyCard, { borderRadius: radius.lg, borderColor: colors.border, backgroundColor: colors.surface, padding: spacing.md }]}> 
+          <Text style={[styles.emptyTitle, { color: colors.text }]}>No orders yet</Text>
+          <Text style={[styles.emptyMeta, { color: colors.textMuted }]}>Your confirmed orders will appear here.</Text>
+        </View>
+      ) : null}
 
       {orders.map((order) => (
-        <View key={order.$id} style={styles.card}>
-          <Text style={styles.orderId}>#{order.$id.slice(-6).toUpperCase()}</Text>
-          <Text style={styles.meta}>Status: {order.status}</Text>
-          <Text style={styles.meta}>Total: {Number(order.total || 0).toFixed(2)} EUR</Text>
+        <View key={order.$id} style={[styles.card, { borderRadius: radius.lg, borderColor: colors.border, backgroundColor: colors.surface, padding: spacing.sm, gap: spacing.xxs }]}> 
+          <View style={styles.orderTop}>
+            <Text style={[styles.orderId, { color: colors.text }]}>#{order.$id.slice(-6).toUpperCase()}</Text>
+            <View
+              style={[
+                styles.statusChip,
+                {
+                  borderRadius: radius.pill,
+                  backgroundColor: order.status === 'pending' ? '#fff2dc' : colors.primarySoft,
+                  borderColor: order.status === 'pending' ? '#f0c981' : colors.primary
+                }
+              ]}
+            >
+              <Text
+                style={{
+                  fontSize: typography.tiny,
+                  fontWeight: '700',
+                  color: order.status === 'pending' ? '#a05f0a' : colors.primary
+                }}
+              >
+                {order.status}
+              </Text>
+            </View>
+          </View>
+          <Text style={[styles.meta, { color: colors.textMuted }]}>Total: {Number(order.total || 0).toFixed(2)} EUR</Text>
           {order.items?.map((item) => (
-            <Text key={item.$id} style={styles.itemText}>
+            <Text key={item.$id} style={[styles.itemText, { color: colors.textMuted }]}>
               {item.quantity}x {item.product_name}
             </Text>
           ))}
-          <Link href={{ pathname: '/(app)/client/orders/[id]/confirmation', params: { id: order.$id } }} style={styles.link}>
-            Open confirmation
-          </Link>
+          <View style={styles.linkRow}>
+            <Link href={{ pathname: '/(app)/client/orders/[id]/confirmation', params: { id: order.$id } }} style={[styles.link, { color: colors.primary }]}> 
+              Open confirmation
+            </Link>
+          </View>
         </View>
       ))}
     </ScrollView>
@@ -77,20 +112,29 @@ export default function ClientOrdersScreen() {
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: '#f5f7fb' },
-  content: { padding: 16, gap: 10 },
-  loaderBox: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#f5f7fb' },
-  title: { fontSize: 24, fontWeight: '700', color: '#10213a' },
+  screen: { flex: 1 },
+  content: {},
+  loaderBox: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 8 },
+  loaderText: { fontWeight: '600' },
+  hero: { borderWidth: 1 },
+  title: { fontWeight: '800', letterSpacing: -0.3 },
+  heroMeta: { fontSize: 13 },
+  emptyCard: { borderWidth: 1, alignItems: 'center', gap: 2 },
+  emptyTitle: { fontWeight: '700' },
+  emptyMeta: { fontSize: 12 },
   card: {
-    backgroundColor: '#fff',
     borderWidth: 1,
-    borderColor: '#dbe4f4',
-    borderRadius: 12,
-    padding: 12,
-    gap: 4
+    shadowColor: '#18273b',
+    shadowOpacity: 0.06,
+    shadowOffset: { width: 0, height: 8 },
+    shadowRadius: 16,
+    elevation: 2
   },
-  orderId: { color: '#10213a', fontSize: 16, fontWeight: '700' },
-  meta: { color: '#576a86' },
-  itemText: { color: '#42526b', fontSize: 12 },
-  link: { color: '#1f6feb', fontWeight: '600', marginTop: 4 }
+  orderTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  orderId: { fontSize: 16, fontWeight: '800' },
+  statusChip: { borderWidth: 1, paddingHorizontal: 8, paddingVertical: 3 },
+  meta: { fontSize: 12 },
+  itemText: { fontSize: 12 },
+  linkRow: { marginTop: 4 },
+  link: { fontWeight: '700' }
 })

@@ -22,7 +22,7 @@ export default function MerchantLayout() {
 
   return (
     <div className="app-shell flex bg-transparent text-slate-900 dark:text-slate-100">
-      <aside className="hidden w-72 flex-col border-r border-slate-200 bg-white/90 backdrop-blur-md dark:border-slate-800 dark:bg-slate-900/90 lg:flex">
+      <aside className="surface-glass hidden w-72 flex-col border-r border-slate-200/70 lg:flex">
         <div className="border-b border-slate-200 p-5 dark:border-slate-800">
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">Espace Marchand</p>
           <p className="mt-1 truncate text-lg font-bold text-slate-900 dark:text-slate-100">{userDoc?.name}</p>
@@ -34,10 +34,10 @@ export default function MerchantLayout() {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`block rounded-lg px-3 py-2.5 text-sm font-semibold transition ${
+                className={`block rounded-2xl px-3 py-2.5 text-sm font-semibold transition ${
                   active
-                    ? 'bg-blue-50 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300'
-                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white'
+                    ? 'bg-blue-100/80 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300'
+                    : 'text-slate-600 hover:bg-white/80 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white'
                 }`}
               >
                 {item.label}
@@ -46,14 +46,14 @@ export default function MerchantLayout() {
           })}
         </nav>
         <div className="border-t border-slate-200 p-4 dark:border-slate-800">
-          <button onClick={logout} className="w-full rounded-lg border border-red-200 px-3 py-2 text-left text-sm font-semibold text-red-700 hover:bg-red-50 dark:border-red-900/60 dark:text-red-400 dark:hover:bg-red-900/20">
+          <button onClick={logout} className="w-full rounded-2xl border border-red-200 px-3 py-2 text-left text-sm font-semibold text-red-700 hover:bg-red-50 dark:border-red-900/60 dark:text-red-400 dark:hover:bg-red-900/20">
             Se deconnecter
           </button>
         </div>
       </aside>
 
       <div className="flex min-h-dvh flex-1 flex-col">
-        <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur-md dark:border-slate-800 dark:bg-slate-900/95">
+        <header className="surface-glass sticky top-0 z-40 border-b border-slate-200/70">
           <div className="app-container flex min-h-16 items-center justify-between gap-4 py-2">
             <div className="flex items-center gap-3">
               <button
@@ -72,7 +72,7 @@ export default function MerchantLayout() {
           </div>
 
           {mobileNavOpen && (
-            <div className="border-t border-slate-200 px-4 py-3 lg:hidden dark:border-slate-800">
+            <div className="rise-in border-t border-slate-200 px-4 py-3 lg:hidden dark:border-slate-800">
               <nav className="grid gap-1">
                 {navItems.map((item) => {
                   const active = location.pathname === item.path;
@@ -81,10 +81,10 @@ export default function MerchantLayout() {
                       key={item.path}
                       to={item.path}
                       onClick={() => setMobileNavOpen(false)}
-                      className={`rounded-lg px-3 py-2 text-sm font-semibold ${
+                      className={`rounded-2xl px-3 py-2 text-sm font-semibold ${
                         active
-                          ? 'bg-blue-50 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300'
-                          : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800'
+                          ? 'bg-blue-100/80 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300'
+                          : 'text-slate-600 hover:bg-white/80 dark:text-slate-300 dark:hover:bg-slate-800'
                       }`}
                     >
                       {item.label}
@@ -94,7 +94,7 @@ export default function MerchantLayout() {
               </nav>
               <button
                 onClick={logout}
-                className="mt-3 w-full rounded-lg border border-red-200 px-3 py-2 text-left text-sm font-semibold text-red-700 hover:bg-red-50 dark:border-red-900/60 dark:text-red-400 dark:hover:bg-red-900/20"
+                className="mt-3 w-full rounded-2xl border border-red-200 px-3 py-2 text-left text-sm font-semibold text-red-700 hover:bg-red-50 dark:border-red-900/60 dark:text-red-400 dark:hover:bg-red-900/20"
               >
                 Se deconnecter
               </button>
@@ -102,7 +102,7 @@ export default function MerchantLayout() {
           )}
         </header>
 
-        <main className="app-container w-full flex-1 py-6 md:py-8">
+        <main className="app-container w-full flex-1 py-6 md:py-8 rise-in">
           <Outlet />
         </main>
       </div>

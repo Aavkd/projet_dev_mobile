@@ -4,6 +4,7 @@ import NotificationToast from '../src/components/NotificationToast'
 import { AuthProvider } from '../src/contexts/AuthContext'
 import { CartProvider } from '../src/contexts/CartContext'
 import { useNotifications } from '../src/hooks/useNotifications'
+import { ThemeProvider } from '../src/theme/ThemeProvider'
 
 function GlobalNotificationLayer() {
   const { notifications } = useNotifications()
@@ -13,12 +14,14 @@ function GlobalNotificationLayer() {
 export default function RootLayout() {
   return (
     <SafeAreaProvider>
-      <AuthProvider>
-        <CartProvider>
-          <Stack screenOptions={{ headerShown: false }} />
-          <GlobalNotificationLayer />
-        </CartProvider>
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <CartProvider>
+            <Stack screenOptions={{ headerShown: false }} />
+            <GlobalNotificationLayer />
+          </CartProvider>
+        </AuthProvider>
+      </ThemeProvider>
     </SafeAreaProvider>
   )
 }

@@ -21,7 +21,7 @@ export default function ClientLayout() {
 
   return (
     <div className="app-shell text-slate-900 dark:text-slate-100">
-      <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/95 backdrop-blur-md dark:border-slate-800 dark:bg-slate-900/95">
+      <header className="surface-glass sticky top-0 z-50 border-b border-slate-200/70">
         <div className="app-container">
           <div className="flex min-h-18 items-center justify-between gap-4 py-3">
             <div className="flex min-w-0 items-center gap-3">
@@ -36,7 +36,7 @@ export default function ClientLayout() {
                 </svg>
               </button>
 
-              <Link to="/client/catalog" className="text-2xl font-extrabold tracking-tight text-blue-700 dark:text-blue-400">
+              <Link to="/client/catalog" className="float-in text-2xl font-extrabold tracking-tight text-blue-700 dark:text-blue-300">
                 Click &amp; Collect
               </Link>
 
@@ -47,10 +47,10 @@ export default function ClientLayout() {
                     <Link
                       key={item.path}
                       to={item.path}
-                      className={`rounded-lg px-3 py-2 text-sm font-semibold transition ${
+                      className={`rounded-2xl px-3 py-2 text-sm font-semibold transition ${
                         active
-                          ? 'bg-blue-50 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300'
-                          : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white'
+                          ? 'bg-blue-100/80 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300'
+                          : 'text-slate-600 hover:bg-white/80 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white'
                       }`}
                     >
                       {item.label}
@@ -66,7 +66,7 @@ export default function ClientLayout() {
               <Link to="/client/cart" className="btn-ghost relative h-10 px-3">
                 <span className="text-sm font-semibold">Panier</span>
                 {itemCount > 0 && (
-                  <span className="absolute -right-2 -top-2 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-red-600 px-1.5 text-[11px] font-bold text-white">
+                  <span className="absolute -right-2 -top-2 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-rose-600 px-1.5 text-[11px] font-bold text-white">
                     {itemCount}
                   </span>
                 )}
@@ -82,7 +82,7 @@ export default function ClientLayout() {
           </div>
 
           {mobileMenuOpen && (
-            <div className="border-t border-slate-200 py-3 md:hidden dark:border-slate-800">
+            <div className="rise-in border-t border-slate-200 py-3 md:hidden dark:border-slate-800">
               <nav className="grid gap-1">
                 {navItems.map((item) => {
                   const active = location.pathname.startsWith(item.path);
@@ -91,10 +91,10 @@ export default function ClientLayout() {
                       key={item.path}
                       to={item.path}
                       onClick={() => setMobileMenuOpen(false)}
-                      className={`rounded-lg px-3 py-2 text-sm font-semibold ${
+                      className={`rounded-2xl px-3 py-2 text-sm font-semibold ${
                         active
-                          ? 'bg-blue-50 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300'
-                          : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800'
+                          ? 'bg-blue-100/80 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300'
+                          : 'text-slate-600 hover:bg-white/80 dark:text-slate-300 dark:hover:bg-slate-800'
                       }`}
                     >
                       {item.label}
@@ -102,7 +102,7 @@ export default function ClientLayout() {
                   );
                 })}
               </nav>
-              <div className="mt-2 flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 dark:border-slate-700 dark:bg-slate-800/70 sm:hidden">
+              <div className="mt-2 flex items-center justify-between rounded-2xl border border-slate-200 bg-slate-50/85 px-3 py-2 dark:border-slate-700 dark:bg-slate-800/70 sm:hidden">
                 <span className="max-w-[70%] truncate text-sm text-slate-600 dark:text-slate-300">{userDoc?.name}</span>
                 <button onClick={logout} className="text-sm font-semibold text-red-600 dark:text-red-400">
                   Deconnexion
@@ -113,7 +113,7 @@ export default function ClientLayout() {
         </div>
       </header>
 
-      <main className="app-container py-6 md:py-8">
+      <main className="app-container py-6 md:py-8 rise-in">
         <Outlet />
       </main>
 

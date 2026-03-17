@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
+import { useTheme } from '../theme/ThemeProvider'
 
 export default function NotificationToast({ notifications }) {
   const [toast, setToast] = useState(null)
+  const { colors, radius, spacing, typography, shadows } = useTheme()
 
   useEffect(() => {
     const unread = notifications.filter((item) => !item.read)
@@ -20,15 +22,28 @@ export default function NotificationToast({ notifications }) {
   if (!toast) return null
 
   return (
-    <View pointerEvents="box-none" style={styles.wrapper}>
-      <View style={styles.container}>
-        <View style={styles.dot} />
+    <View pointerEvents="box-none" style={[styles.wrapper, { left: spacing.sm, right: spacing.sm, bottom: spacing.lg + 2 }]}>
+      <View
+        style={[
+          styles.container,
+          shadows.card,
+          {
+            borderRadius: radius.lg,
+            borderColor: colors.border,
+            backgroundColor: colors.surface,
+            paddingHorizontal: spacing.sm,
+            paddingVertical: 10,
+            gap: spacing.xs
+          }
+        ]}
+      >
+        <View style={[styles.dot, { backgroundColor: colors.primary }]} />
         <View style={styles.content}>
-          <Text style={styles.title}>New notification</Text>
-          <Text style={styles.message}>{toast.message}</Text>
+          <Text style={[styles.title, { color: colors.text }]}>New notification</Text>
+          <Text style={[styles.message, { color: colors.textMuted, fontSize: typography.caption }]}>{toast.message}</Text>
         </View>
         <Pressable onPress={() => setToast(null)}>
-          <Text style={styles.close}>Close</Text>
+          <Text style={[styles.close, { color: colors.primary }]}>Close</Text>
         </Pressable>
       </View>
     </View>
@@ -38,21 +53,12 @@ export default function NotificationToast({ notifications }) {
 const styles = StyleSheet.create({
   wrapper: {
     position: 'absolute',
-    left: 12,
-    right: 12,
-    bottom: 22,
     zIndex: 1000
   },
   container: {
-    borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#d4dcf0',
-    backgroundColor: '#ffffff',
-    paddingHorizontal: 12,
-    paddingVertical: 10,
     flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10
+    alignItems: 'center'
   },
   dot: {
     width: 9,
@@ -65,15 +71,10 @@ const styles = StyleSheet.create({
   },
   title: {
     fontWeight: '700',
-    color: '#10213a',
     marginBottom: 2
   },
-  message: {
-    color: '#42526b',
-    fontSize: 12
-  },
+  message: {},
   close: {
-    color: '#1f6feb',
-    fontWeight: '600'
+    fontWeight: '700'
   }
 })

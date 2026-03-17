@@ -1,20 +1,16 @@
 import { Link, useRouter } from 'expo-router'
 import { useState } from 'react'
-import {
-  ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  View
-} from 'react-native'
+import { Pressable, StyleSheet, Text, View } from 'react-native'
+import AppButton from '../../src/components/ui/AppButton'
+import AppInput from '../../src/components/ui/AppInput'
+import AuthShell from '../../src/components/ui/AuthShell'
 import { useAuth } from '../../src/contexts/AuthContext'
+import { useTheme } from '../../src/theme/ThemeProvider'
 
 export default function RegisterScreen() {
   const router = useRouter()
   const { register } = useAuth()
+  const { colors, radius, spacing, typography } = useTheme()
 
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
@@ -38,91 +34,89 @@ export default function RegisterScreen() {
   }
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      style={styles.container}
-    >
-      <View style={styles.card}>
-        <Text style={styles.title}>Create account</Text>
-
-        <TextInput placeholder="Full name" style={styles.input} value={name} onChangeText={setName} />
-        <TextInput
+    <AuthShell title="Create account" subtitle="Choose your role and start using your space.">
+      <View style={styles.stack}>
+        <AppInput placeholder="Full name" value={name} onChangeText={setName} />
+        <AppInput
           autoCapitalize="none"
           keyboardType="email-address"
           placeholder="Email"
-          style={styles.input}
           value={email}
           onChangeText={setEmail}
         />
-        <TextInput
+        <AppInput
           placeholder="Password"
           secureTextEntry
-          style={styles.input}
           value={password}
           onChangeText={setPassword}
         />
 
         <View style={styles.roleRow}>
           <Pressable
-            style={[styles.roleButton, role === 'client' && styles.roleButtonActive]}
+            style={[
+              styles.roleButton,
+              {
+                borderColor: role === 'client' ? colors.primary : colors.borderStrong,
+                borderRadius: radius.md,
+                backgroundColor: role === 'client' ? colors.primarySoft : colors.surfaceSoft,
+                paddingVertical: spacing.sm
+              }
+            ]}
             onPress={() => setRole('client')}
           >
-            <Text style={[styles.roleText, role === 'client' && styles.roleTextActive]}>Client</Text>
+            <Text
+              style={[
+                styles.roleText,
+                {
+                  color: role === 'client' ? colors.primary : colors.textMuted,
+                  fontSize: typography.caption
+                }
+              ]}
+            >
+              Client
+            </Text>
           </Pressable>
           <Pressable
-            style={[styles.roleButton, role === 'merchant' && styles.roleButtonActive]}
+            style={[
+              styles.roleButton,
+              {
+                borderColor: role === 'merchant' ? colors.primary : colors.borderStrong,
+                borderRadius: radius.md,
+                backgroundColor: role === 'merchant' ? colors.primarySoft : colors.surfaceSoft,
+                paddingVertical: spacing.sm
+              }
+            ]}
             onPress={() => setRole('merchant')}
           >
-            <Text style={[styles.roleText, role === 'merchant' && styles.roleTextActive]}>Merchant</Text>
+            <Text
+              style={[
+                styles.roleText,
+                {
+                  color: role === 'merchant' ? colors.primary : colors.textMuted,
+                  fontSize: typography.caption
+                }
+              ]}
+            >
+              Merchant
+            </Text>
           </Pressable>
         </View>
 
-        {error ? <Text style={styles.error}>{error}</Text> : null}
+        {error ? <Text style={[styles.error, { color: colors.danger }]}>{error}</Text> : null}
 
-        <Pressable style={styles.button} onPress={onSubmit} disabled={pending}>
-          {pending ? (
-            <ActivityIndicator color="#ffffff" />
-          ) : (
-            <Text style={styles.buttonText}>Register</Text>
-          )}
-        </Pressable>
+        <AppButton title="Register" onPress={onSubmit} pending={pending} />
 
-        <Link href="/(auth)/login" style={styles.link}>
+        <Link href="/(auth)/login" style={[styles.link, { color: colors.primary, fontSize: typography.caption }]}>
           I already have an account
         </Link>
       </View>
-    </KeyboardAvoidingView>
+    </AuthShell>
   )
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f7fb',
-    justifyContent: 'center',
-    padding: 20
-  },
-  card: {
-    backgroundColor: '#ffffff',
-    borderRadius: 16,
-    padding: 20,
-    gap: 12,
-    borderWidth: 1,
-    borderColor: '#dbe4f4'
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#10213a',
-    marginBottom: 4
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#c9d6ea',
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    backgroundColor: '#fbfdff'
+  stack: {
+    gap: 12
   },
   roleRow: {
     flexDirection: 'row',
@@ -131,39 +125,17 @@ const styles = StyleSheet.create({
   roleButton: {
     flex: 1,
     borderWidth: 1,
-    borderColor: '#c9d6ea',
-    borderRadius: 10,
-    paddingVertical: 10,
     alignItems: 'center'
-  },
-  roleButtonActive: {
-    backgroundColor: '#1f6feb',
-    borderColor: '#1f6feb'
   },
   roleText: {
-    color: '#42526b',
     fontWeight: '600'
-  },
-  roleTextActive: {
-    color: '#ffffff'
   },
   error: {
-    color: '#b42318',
     fontSize: 13
   },
-  button: {
-    backgroundColor: '#1f6feb',
-    borderRadius: 10,
-    paddingVertical: 12,
-    alignItems: 'center'
-  },
-  buttonText: {
-    color: '#ffffff',
-    fontWeight: '600'
-  },
   link: {
-    color: '#1f6feb',
     textAlign: 'center',
-    marginTop: 4
+    marginTop: 2,
+    fontWeight: '600'
   }
 })

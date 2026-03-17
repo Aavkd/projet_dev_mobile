@@ -2,11 +2,13 @@ import { Link, useLocalSearchParams } from 'expo-router'
 import { useEffect, useState } from 'react'
 import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native'
 import { useAuth } from '../../../../../src/contexts/AuthContext'
+import { useTheme } from '../../../../../src/theme/ThemeProvider'
 import { orderService } from '../../../../../src/services/orderService'
 
 export default function OrderConfirmationScreen() {
   const { id } = useLocalSearchParams()
   const { user } = useAuth()
+  const { colors, radius, spacing, typography } = useTheme()
   const [order, setOrder] = useState(null)
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
@@ -40,35 +42,36 @@ export default function OrderConfirmationScreen() {
 
   if (loading) {
     return (
-      <View style={styles.loaderBox}>
-        <ActivityIndicator size="large" color="#1f6feb" />
+      <View style={[styles.loaderBox, { backgroundColor: colors.background }]}> 
+        <ActivityIndicator size="large" color={colors.primary} />
+        <Text style={[styles.loaderText, { color: colors.textMuted }]}>Loading order...</Text>
       </View>
     )
   }
 
   if (!order) {
     return (
-      <View style={styles.loaderBox}>
-        <Text style={styles.error}>Order not found</Text>
+      <View style={[styles.loaderBox, { backgroundColor: colors.background }]}> 
+        <Text style={[styles.error, { color: colors.danger }]}>Order not found</Text>
       </View>
     )
   }
 
   return (
-    <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
-      <View style={styles.card}>
-        <Text style={styles.title}>Order confirmed</Text>
-        <Text style={styles.meta}>Tracking: #{order.$id.slice(-6).toUpperCase()}</Text>
-        <Text style={styles.meta}>Status: {order.status}</Text>
-        <Text style={styles.total}>Total: {Number(order.total || 0).toFixed(2)} EUR</Text>
+    <ScrollView style={[styles.screen, { backgroundColor: colors.background }]} contentContainerStyle={[styles.content, { padding: spacing.md }]}> 
+      <View style={[styles.card, { borderRadius: radius.lg, borderColor: colors.border, backgroundColor: colors.surface, padding: spacing.md, gap: spacing.xxs }]}> 
+        <Text style={[styles.title, { color: colors.text, fontSize: typography.titleM }]}>Order confirmed</Text>
+        <Text style={[styles.meta, { color: colors.textMuted }]}>Tracking: #{order.$id.slice(-6).toUpperCase()}</Text>
+        <Text style={[styles.meta, { color: colors.textMuted }]}>Status: {order.status}</Text>
+        <Text style={[styles.total, { color: colors.primary }]}>Total: {Number(order.total || 0).toFixed(2)} EUR</Text>
 
         {items.map((item) => (
-          <Text key={item.$id} style={styles.item}>
+          <Text key={item.$id} style={[styles.item, { color: colors.textMuted }]}>
             {item.quantity}x {item.product_name} ({Number(item.unit_price || 0).toFixed(2)} EUR)
           </Text>
         ))}
 
-        <Link href="/(app)/client/orders" style={styles.link}>
+        <Link href="/(app)/client/orders" style={[styles.link, { color: colors.primary }]}> 
           Back to my orders
         </Link>
       </View>
@@ -77,21 +80,22 @@ export default function OrderConfirmationScreen() {
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: '#f5f7fb' },
-  content: { padding: 16 },
-  loaderBox: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#f5f7fb' },
-  error: { color: '#b42318', fontWeight: '700' },
+  screen: { flex: 1 },
+  content: {},
+  loaderBox: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 8 },
+  loaderText: { fontWeight: '600' },
+  error: { fontWeight: '700' },
   card: {
-    backgroundColor: '#fff',
     borderWidth: 1,
-    borderColor: '#dbe4f4',
-    borderRadius: 12,
-    padding: 14,
-    gap: 6
+    shadowColor: '#18273b',
+    shadowOpacity: 0.06,
+    shadowOffset: { width: 0, height: 8 },
+    shadowRadius: 16,
+    elevation: 2
   },
-  title: { fontSize: 22, fontWeight: '700', color: '#10213a' },
-  meta: { color: '#4f617c' },
-  total: { color: '#1f6feb', fontWeight: '700', marginTop: 6 },
-  item: { color: '#42526b', fontSize: 13 },
-  link: { color: '#1f6feb', marginTop: 10, fontWeight: '700' }
+  title: { fontWeight: '800', letterSpacing: -0.3 },
+  meta: { fontSize: 13 },
+  total: { fontWeight: '800', marginVertical: 6, fontSize: 18 },
+  item: { fontSize: 13 },
+  link: { marginTop: 10, fontWeight: '700' }
 })

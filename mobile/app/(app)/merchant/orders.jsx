@@ -1,12 +1,15 @@
 import { useCallback, useEffect, useState } from 'react'
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native'
 import { APPWRITE_DATABASE_ID, COLLECTIONS } from '../../../src/lib/env'
+import AppButton from '../../../src/components/ui/AppButton'
 import { useAuth } from '../../../src/contexts/AuthContext'
+import { useTheme } from '../../../src/theme/ThemeProvider'
 import { orderService } from '../../../src/services/orderService'
 import { useRealtime } from '../../../src/hooks/useRealtime'
 
 export default function MerchantOrdersScreen() {
   const { user } = useAuth()
+  const { colors, radius, spacing, typography } = useTheme()
   const [orders, setOrders] = useState([])
   const [loading, setLoading] = useState(true)
 
@@ -52,29 +55,43 @@ export default function MerchantOrdersScreen() {
 
   if (loading) {
     return (
-      <View style={styles.loaderBox}>
-        <ActivityIndicator size="large" color="#1f6feb" />
+      <View style={[styles.loaderBox, { backgroundColor: colors.background }]}>
+        <ActivityIndicator size="large" color={colors.primary} />
+        <Text style={[styles.loaderText, { color: colors.textMuted }]}>Loading pending orders...</Text>
       </View>
     )
   }
 
   return (
-    <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
-      <Text style={styles.title}>Pending orders</Text>
-      {orders.length === 0 ? <Text style={styles.meta}>No pending orders</Text> : null}
+    <ScrollView style={[styles.screen, { backgroundColor: colors.background }]} contentContainerStyle={[styles.content, { padding: spacing.md, gap: spacing.sm }]}> 
+      <View style={[styles.hero, { borderRadius: radius.lg, borderColor: colors.border, backgroundColor: colors.primarySoft, padding: spacing.md }]}> 
+        <Text style={[styles.title, { color: colors.text, fontSize: typography.titleM }]}>Pending orders</Text>
+        <Text style={[styles.heroMeta, { color: colors.textMuted }]}>Prepare each order and mark it ready for pickup.</Text>
+      </View>
+
+      {orders.length === 0 ? (
+        <View style={[styles.emptyCard, { borderRadius: radius.lg, borderColor: colors.border, backgroundColor: colors.surface, padding: spacing.md }]}> 
+          <Text style={[styles.emptyTitle, { color: colors.text }]}>No pending orders</Text>
+          <Text style={[styles.emptyMeta, { color: colors.textMuted }]}>New orders will appear here in real time.</Text>
+        </View>
+      ) : null}
 
       {orders.map((order) => (
-        <View key={order.$id} style={styles.card}>
-          <Text style={styles.orderId}>#{order.$id.slice(-6).toUpperCase()}</Text>
-          <Text style={styles.meta}>Total: {Number(order.total || 0).toFixed(2)} EUR</Text>
+        <View key={order.$id} style={[styles.card, { borderRadius: radius.lg, borderColor: colors.border, backgroundColor: colors.surface, padding: spacing.sm, gap: spacing.xxs }]}> 
+          <View style={styles.topRow}>
+            <Text style={[styles.orderId, { color: colors.text }]}>#{order.$id.slice(-6).toUpperCase()}</Text>
+            <View style={[styles.pendingChip, { borderRadius: radius.pill, borderColor: '#f0c981', backgroundColor: '#fff2dc' }]}>
+              <Text style={styles.pendingText}>pending</Text>
+            </View>
+          </View>
+
+          <Text style={[styles.meta, { color: colors.textMuted }]}>Total: {Number(order.total || 0).toFixed(2)} EUR</Text>
           {order.items?.map((item) => (
-            <Text key={item.$id} style={styles.itemText}>
+            <Text key={item.$id} style={[styles.itemText, { color: colors.textMuted }]}>
               {item.quantity}x {item.product_name}
             </Text>
           ))}
-          <Pressable style={styles.primaryBtn} onPress={() => markReady(order.$id, order.client_id)}>
-            <Text style={styles.primaryBtnText}>Mark ready</Text>
-          </Pressable>
+          <AppButton title="Mark ready" onPress={() => markReady(order.$id, order.client_id)} style={[styles.fullBtn, { marginTop: spacing.xs }]} />
         </View>
       ))}
     </ScrollView>
@@ -82,21 +99,29 @@ export default function MerchantOrdersScreen() {
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: '#f5f7fb' },
-  content: { padding: 16, gap: 10 },
-  loaderBox: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#f5f7fb' },
-  title: { fontSize: 24, fontWeight: '700', color: '#10213a' },
+  screen: { flex: 1 },
+  content: {},
+  loaderBox: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 8 },
+  loaderText: { fontWeight: '600' },
+  hero: { borderWidth: 1 },
+  title: { fontWeight: '800', letterSpacing: -0.3 },
+  heroMeta: { fontSize: 13 },
+  emptyCard: { borderWidth: 1, alignItems: 'center', gap: 2 },
+  emptyTitle: { fontWeight: '700' },
+  emptyMeta: { fontSize: 12 },
   card: {
-    backgroundColor: '#fff',
     borderWidth: 1,
-    borderColor: '#dbe4f4',
-    borderRadius: 12,
-    padding: 12,
-    gap: 4
+    shadowColor: '#18273b',
+    shadowOpacity: 0.06,
+    shadowOffset: { width: 0, height: 8 },
+    shadowRadius: 16,
+    elevation: 2
   },
-  orderId: { color: '#10213a', fontWeight: '700' },
-  meta: { color: '#576a86' },
-  itemText: { color: '#42526b', fontSize: 12 },
-  primaryBtn: { marginTop: 8, borderRadius: 10, backgroundColor: '#1f6feb', alignItems: 'center', paddingVertical: 10 },
-  primaryBtnText: { color: '#fff', fontWeight: '700' }
+  topRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  pendingChip: { borderWidth: 1, paddingHorizontal: 8, paddingVertical: 3 },
+  pendingText: { color: '#a05f0a', fontWeight: '700', fontSize: 11 },
+  orderId: { fontWeight: '800', fontSize: 16 },
+  meta: { fontSize: 12 },
+  itemText: { fontSize: 12 },
+  fullBtn: { width: '100%' }
 })

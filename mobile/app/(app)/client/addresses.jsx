@@ -1,10 +1,14 @@
 import { useEffect, useState } from 'react'
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
+import AppButton from '../../../src/components/ui/AppButton'
+import AppInput from '../../../src/components/ui/AppInput'
 import { useAuth } from '../../../src/contexts/AuthContext'
+import { useTheme } from '../../../src/theme/ThemeProvider'
 import { addressService } from '../../../src/services/addressService'
 
 export default function AddressesScreen() {
   const { user } = useAuth()
+  const { colors, radius, spacing, typography } = useTheme()
   const [addresses, setAddresses] = useState([])
   const [label, setLabel] = useState('')
   const [address, setAddress] = useState('')
@@ -47,33 +51,51 @@ export default function AddressesScreen() {
   }
 
   return (
-    <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
-      <Text style={styles.title}>My addresses</Text>
-
-      <View style={styles.card}>
-        <TextInput style={styles.input} placeholder="Label (Home, Work...)" value={label} onChangeText={setLabel} />
-        <TextInput style={styles.input} placeholder="Full address" value={address} onChangeText={setAddress} />
-        <Pressable style={styles.primaryBtn} onPress={addAddress}>
-          <Text style={styles.primaryBtnText}>Add address</Text>
-        </Pressable>
+    <ScrollView style={[styles.screen, { backgroundColor: colors.background }]} contentContainerStyle={[styles.content, { padding: spacing.md, gap: spacing.sm }]}> 
+      <View style={[styles.hero, { borderRadius: radius.lg, borderColor: colors.border, backgroundColor: colors.primarySoft, padding: spacing.md }]}> 
+        <Text style={[styles.title, { color: colors.text, fontSize: typography.titleM }]}>My addresses</Text>
+        <Text style={[styles.heroMeta, { color: colors.textMuted }]}>Pick where your order should be ready.</Text>
       </View>
 
-      {!loading && addresses.length === 0 ? <Text style={styles.meta}>No addresses yet</Text> : null}
+      <View style={[styles.card, { borderRadius: radius.lg, borderColor: colors.border, backgroundColor: colors.surface, padding: spacing.sm, gap: spacing.xs }]}> 
+        <AppInput placeholder="Label (Home, Work...)" value={label} onChangeText={setLabel} />
+        <AppInput placeholder="Full address" value={address} onChangeText={setAddress} />
+        <AppButton title="Add address" onPress={addAddress} style={styles.fullBtn} />
+      </View>
+
+      {!loading && addresses.length === 0 ? (
+        <View style={[styles.emptyCard, { borderRadius: radius.lg, borderColor: colors.border, backgroundColor: colors.surface, padding: spacing.md }]}> 
+          <Text style={[styles.emptyTitle, { color: colors.text }]}>No addresses yet</Text>
+          <Text style={[styles.meta, { color: colors.textMuted }]}>Add your first pickup address above.</Text>
+        </View>
+      ) : null}
 
       {addresses.map((item) => (
-        <View key={item.$id} style={[styles.card, item.is_default && styles.defaultCard]}>
-          <Text style={styles.itemName}>{item.label}</Text>
-          <Text style={styles.meta}>{item.address}</Text>
+        <View
+          key={item.$id}
+          style={[
+            styles.card,
+            {
+              borderRadius: radius.lg,
+              borderColor: item.is_default ? colors.primary : colors.border,
+              backgroundColor: item.is_default ? colors.primarySoft : colors.surface,
+              padding: spacing.sm,
+              gap: spacing.xxs
+            }
+          ]}
+        >
+          <Text style={[styles.itemName, { color: colors.text }]}>{item.label}</Text>
+          <Text style={[styles.meta, { color: colors.textMuted }]}>{item.address}</Text>
           <View style={styles.row}>
             {!item.is_default ? (
               <Pressable onPress={() => setDefault(item.$id)}>
-                <Text style={styles.link}>Set default</Text>
+                <Text style={[styles.link, { color: colors.primary }]}>Set default</Text>
               </Pressable>
             ) : (
-              <Text style={styles.defaultTag}>Default</Text>
+              <Text style={[styles.defaultTag, { color: colors.primary }]}>Default</Text>
             )}
             <Pressable onPress={() => removeAddress(item.$id)}>
-              <Text style={styles.remove}>Delete</Text>
+              <Text style={[styles.remove, { color: colors.danger }]}>Delete</Text>
             </Pressable>
           </View>
         </View>
@@ -83,32 +105,19 @@ export default function AddressesScreen() {
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: '#f5f7fb' },
-  content: { padding: 16, gap: 10 },
-  title: { fontSize: 24, fontWeight: '700', color: '#10213a' },
-  card: {
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#dbe4f4',
-    borderRadius: 12,
-    padding: 12,
-    gap: 8
-  },
-  defaultCard: { borderColor: '#1f6feb' },
-  input: {
-    borderWidth: 1,
-    borderColor: '#c9d6ea',
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    backgroundColor: '#fbfdff'
-  },
-  itemName: { color: '#10213a', fontWeight: '700' },
-  meta: { color: '#576a86' },
+  screen: { flex: 1 },
+  content: {},
+  hero: { borderWidth: 1 },
+  heroMeta: { fontSize: 13 },
+  title: { fontWeight: '800', letterSpacing: -0.3 },
+  card: { borderWidth: 1 },
+  fullBtn: { width: '100%' },
+  emptyCard: { borderWidth: 1, alignItems: 'center', gap: 2 },
+  emptyTitle: { fontWeight: '700' },
+  itemName: { fontWeight: '700' },
+  meta: { fontSize: 13 },
   row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 4 },
-  link: { color: '#1f6feb', fontWeight: '600' },
-  defaultTag: { color: '#1f6feb', fontWeight: '700' },
-  remove: { color: '#b42318', fontWeight: '600' },
-  primaryBtn: { borderRadius: 10, backgroundColor: '#1f6feb', alignItems: 'center', paddingVertical: 11 },
-  primaryBtnText: { color: '#fff', fontWeight: '700' }
+  link: { fontWeight: '700' },
+  defaultTag: { fontWeight: '800' },
+  remove: { fontWeight: '700' }
 })

@@ -32,33 +32,39 @@
 }
 
 :root {
-  --app-bg: #eef2f6;
-  --app-bg-soft: #e7edf3;
-  --app-fg: #172033;
+  --app-bg: #edf3fa;
+  --app-bg-soft: #e4edf7;
+  --app-fg: #1a2a3d;
   --surface-0: #ffffff;
-  --surface-1: #f8fafc;
-  --surface-2: #eef2f7;
-  --line: #d8e1ea;
-  --line-strong: #c6d2dd;
-  --accent: #1f5ad7;
-  --accent-hover: #154ab9;
-  --danger: #c53939;
-  --success: #0f8f5a;
+  --surface-1: #f6f9ff;
+  --surface-2: #edf3fb;
+  --line: #d4deeb;
+  --line-strong: #bfd0e5;
+  --accent: #1f63e9;
+  --accent-hover: #1a53c5;
+  --accent-soft: #dbe8ff;
+  --danger: #c73943;
+  --success: #108a5e;
+  --warning: #c77a11;
+  --shadow-color: color-mix(in srgb, #0f2036 16%, transparent);
 }
 
 .dark {
-  --app-bg: #0d141f;
-  --app-bg-soft: #111b2a;
-  --app-fg: #dbe5f3;
-  --surface-0: #121d2b;
-  --surface-1: #182437;
-  --surface-2: #1e2d44;
-  --line: #2a3b56;
-  --line-strong: #345073;
-  --accent: #5c93ff;
-  --accent-hover: #7ca9ff;
+  --app-bg: #0d1521;
+  --app-bg-soft: #102035;
+  --app-fg: #dbe7f7;
+  --surface-0: #152235;
+  --surface-1: #1b2a40;
+  --surface-2: #22344f;
+  --line: #2f4461;
+  --line-strong: #3b5578;
+  --accent: #74a6ff;
+  --accent-hover: #93bbff;
+  --accent-soft: #1f3660;
   --danger: #ee6d6d;
   --success: #3dcf8e;
+  --warning: #f7b955;
+  --shadow-color: color-mix(in srgb, #02060c 40%, transparent);
 }
 
 *,
@@ -75,8 +81,9 @@ html {
 body {
   margin: 0;
   background:
-    radial-gradient(circle at 0% 0%, color-mix(in srgb, var(--app-bg-soft) 62%, transparent) 0, transparent 36%),
-    radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--app-bg-soft) 56%, transparent) 0, transparent 35%),
+    radial-gradient(circle at 5% 0%, color-mix(in srgb, var(--app-bg-soft) 70%, transparent) 0, transparent 42%),
+    radial-gradient(circle at 95% 0%, color-mix(in srgb, var(--accent-soft) 44%, transparent) 0, transparent 38%),
+    radial-gradient(circle at 50% 100%, color-mix(in srgb, var(--surface-2) 60%, transparent) 0, transparent 45%),
     var(--app-bg);
   color: var(--app-fg);
   @apply antialiased transition-colors duration-300 leading-relaxed;
@@ -124,18 +131,35 @@ body {
   .app-card {
     background-color: var(--surface-0);
     border: 1px solid var(--line);
-    @apply rounded-2xl shadow-sm;
+    box-shadow: 0 16px 36px -28px var(--shadow-color);
+    @apply rounded-3xl;
+  }
+
+  .app-card-soft {
+    background-color: color-mix(in srgb, var(--surface-0) 84%, var(--accent-soft));
+    border: 1px solid color-mix(in srgb, var(--line) 85%, transparent);
+    box-shadow: 0 12px 28px -24px var(--shadow-color);
+    @apply rounded-3xl;
   }
 
   .page-title {
     @apply text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-slate-100;
+    letter-spacing: -0.025em;
+  }
+
+  .section-title {
+    @apply text-lg font-bold text-slate-800 dark:text-slate-100;
+  }
+
+  .section-subtitle {
+    @apply text-sm text-slate-600 dark:text-slate-300;
   }
 
   .ui-input {
-    background-color: var(--surface-0);
+    background-color: color-mix(in srgb, var(--surface-0) 88%, var(--surface-1));
     border: 1px solid var(--line-strong);
     color: var(--app-fg);
-    @apply w-full rounded-xl px-3.5 py-2.5 text-sm transition;
+    @apply w-full rounded-2xl px-4 py-3 text-sm transition;
   }
 
   .ui-input:focus {
@@ -147,7 +171,8 @@ body {
   .btn-primary {
     background-color: var(--accent);
     color: #fff;
-    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition;
+    box-shadow: 0 12px 20px -16px color-mix(in srgb, var(--accent) 55%, transparent);
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-semibold transition;
   }
 
   .btn-primary:hover {
@@ -158,15 +183,62 @@ body {
     @apply opacity-60 cursor-not-allowed;
   }
 
+  .btn-primary:active {
+    transform: translateY(1px);
+  }
+
   .btn-ghost {
     border: 1px solid var(--line-strong);
     color: var(--app-fg);
-    background-color: var(--surface-0);
-    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition;
+    background-color: color-mix(in srgb, var(--surface-0) 86%, var(--surface-1));
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-semibold transition;
   }
 
   .btn-ghost:hover {
     background-color: var(--surface-1);
+  }
+
+  .status-badge {
+    border: 1px solid transparent;
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold;
+  }
+
+  .status-success {
+    border-color: color-mix(in srgb, var(--success) 35%, transparent);
+    background-color: color-mix(in srgb, var(--success) 15%, transparent);
+    color: var(--success);
+  }
+
+  .status-warning {
+    border-color: color-mix(in srgb, var(--warning) 35%, transparent);
+    background-color: color-mix(in srgb, var(--warning) 16%, transparent);
+    color: var(--warning);
+  }
+
+  .status-danger {
+    border-color: color-mix(in srgb, var(--danger) 35%, transparent);
+    background-color: color-mix(in srgb, var(--danger) 16%, transparent);
+    color: var(--danger);
+  }
+
+  .surface-glass {
+    background: color-mix(in srgb, var(--surface-0) 76%, transparent);
+    border: 1px solid color-mix(in srgb, var(--line) 78%, transparent);
+    backdrop-filter: blur(14px);
+  }
+
+  .empty-state {
+    background-color: var(--surface-0);
+    border: 1px solid var(--line);
+    box-shadow: 0 16px 36px -28px var(--shadow-color);
+    @apply flex flex-col items-center justify-center gap-2 rounded-3xl px-6 py-10 text-center;
+  }
+
+  .loading-state {
+    background-color: var(--surface-0);
+    border: 1px solid var(--line);
+    box-shadow: 0 16px 36px -28px var(--shadow-color);
+    @apply flex items-center justify-center rounded-3xl px-6 py-10 text-sm font-medium text-slate-600 dark:text-slate-300;
   }
 }
 
@@ -175,11 +247,41 @@ body {
     @apply transition-all duration-200 ease-in-out;
   }
 
+  .rise-in {
+    animation: riseIn 420ms ease-out both;
+  }
+
+  .float-in {
+    animation: floatIn 480ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+
   .text-muted {
     @apply text-slate-600 dark:text-slate-400;
   }
 
   .content-grid {
     @apply grid grid-cols-1 gap-5 md:gap-6;
+  }
+}
+
+@keyframes riseIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes floatIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }

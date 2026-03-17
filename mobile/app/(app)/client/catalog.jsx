@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'expo-router'
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
+import AppButton from '../../../src/components/ui/AppButton'
 import { useCart } from '../../../src/contexts/CartContext'
+import { useTheme } from '../../../src/theme/ThemeProvider'
 import { productService } from '../../../src/services/productService'
 
 export default function CatalogScreen() {
@@ -10,6 +12,7 @@ export default function CatalogScreen() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const { addToCart } = useCart()
+  const { colors, radius, spacing, typography } = useTheme()
 
   useEffect(() => {
     productService
@@ -31,51 +34,127 @@ export default function CatalogScreen() {
 
   if (loading) {
     return (
-      <View style={styles.loaderBox}>
-        <ActivityIndicator size="large" color="#1f6feb" />
+      <View style={[styles.loaderBox, { backgroundColor: colors.background }]}> 
+        <ActivityIndicator size="large" color={colors.primary} />
+        <Text style={[styles.loaderText, { color: colors.textMuted }]}>Loading catalog...</Text>
       </View>
     )
   }
 
   return (
-    <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
-      <Text style={styles.title}>Catalog</Text>
-      {error ? <Text style={styles.error}>{error}</Text> : null}
+    <ScrollView style={[styles.screen, { backgroundColor: colors.background }]} contentContainerStyle={[styles.content, { padding: spacing.md, gap: spacing.sm }]}> 
+      <View style={[styles.hero, { borderRadius: radius.lg, backgroundColor: colors.primarySoft, borderColor: colors.border, padding: spacing.md }]}> 
+        <Text style={[styles.title, { color: colors.text, fontSize: typography.titleM }]}>Catalog</Text>
+        <Text style={[styles.subtitle, { color: colors.textMuted }]}>Discover fresh picks and add them to your cart.</Text>
+      </View>
 
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterRow}>
-        <Pressable style={[styles.pill, !categoryFilter && styles.pillActive]} onPress={() => setCategoryFilter('')}>
-          <Text style={[styles.pillText, !categoryFilter && styles.pillTextActive]}>All</Text>
+      {error ? <Text style={[styles.error, { color: colors.danger }]}>{error}</Text> : null}
+
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.filterRow, { gap: spacing.xs }]}> 
+        <Pressable
+          style={[
+            styles.pill,
+            {
+              borderRadius: radius.pill,
+              borderColor: !categoryFilter ? colors.primary : colors.borderStrong,
+              backgroundColor: !categoryFilter ? colors.primarySoft : colors.surface,
+              paddingHorizontal: spacing.sm,
+              paddingVertical: 7
+            }
+          ]}
+          onPress={() => setCategoryFilter('')}
+        >
+          <Text style={[styles.pillText, { color: !categoryFilter ? colors.primary : colors.textMuted }]}>All</Text>
         </Pressable>
         {categories.map((category) => (
           <Pressable
             key={category}
-            style={[styles.pill, categoryFilter === category && styles.pillActive]}
+            style={[
+              styles.pill,
+              {
+                borderRadius: radius.pill,
+                borderColor: categoryFilter === category ? colors.primary : colors.borderStrong,
+                backgroundColor: categoryFilter === category ? colors.primarySoft : colors.surface,
+                paddingHorizontal: spacing.sm,
+                paddingVertical: 7
+              }
+            ]}
             onPress={() => setCategoryFilter(category)}
           >
-            <Text style={[styles.pillText, categoryFilter === category && styles.pillTextActive]}>{category}</Text>
+            <Text style={[styles.pillText, { color: categoryFilter === category ? colors.primary : colors.textMuted }]}>{category}</Text>
           </Pressable>
         ))}
       </ScrollView>
 
-      <View style={styles.list}>
-        {filteredProducts.map((product) => (
-          <View key={product.$id} style={styles.card}>
-            <Text style={styles.productName}>{product.name}</Text>
-            <Text style={styles.meta}>{product.category || 'No category'}</Text>
-            <Text style={styles.meta}>Stock: {product.stock}</Text>
-            <Text style={styles.price}>{Number(product.price || 0).toFixed(2)} EUR</Text>
+      <View style={[styles.list, { gap: spacing.xs }]}> 
+        {filteredProducts.length === 0 ? (
+          <View style={[styles.emptyCard, { borderRadius: radius.lg, borderColor: colors.border, backgroundColor: colors.surface, padding: spacing.md }]}> 
+            <Text style={[styles.emptyTitle, { color: colors.text }]}>No products in this category</Text>
+            <Text style={[styles.emptyText, { color: colors.textMuted }]}>Try another filter to see available items.</Text>
+          </View>
+        ) : null}
 
-            <View style={styles.row}>
-              <Link href={{ pathname: '/(app)/client/product/[id]', params: { id: product.$id } }} asChild>
-                <Pressable style={styles.secondaryBtn}><Text style={styles.secondaryBtnText}>Details</Text></Pressable>
-              </Link>
-              <Pressable
-                style={[styles.primaryBtn, product.stock <= 0 && styles.btnDisabled]}
-                disabled={product.stock <= 0}
-                onPress={() => addToCart(product, 1)}
+        {filteredProducts.map((product) => (
+          <View
+            key={product.$id}
+            style={[
+              styles.card,
+              {
+                borderRadius: radius.lg,
+                borderColor: colors.border,
+                backgroundColor: colors.surface,
+                padding: spacing.sm,
+                gap: spacing.xxs
+              }
+            ]}
+          >
+            <View style={styles.productHead}>
+              <Text style={[styles.productName, { color: colors.text }]}>{product.name}</Text>
+              <View
+                style={[
+                  styles.stockBadge,
+                  {
+                    borderRadius: radius.pill,
+                    backgroundColor: product.stock > 0 ? colors.primarySoft : '#fde2e5',
+                    borderColor: product.stock > 0 ? colors.primary : colors.danger
+                  }
+                ]}
               >
-                <Text style={styles.primaryBtnText}>Add</Text>
-              </Pressable>
+                <Text style={{ color: product.stock > 0 ? colors.primary : colors.danger, fontSize: typography.tiny, fontWeight: '700' }}>
+                  {product.stock > 0 ? `Stock ${product.stock}` : 'Out of stock'}
+                </Text>
+              </View>
+            </View>
+
+            <Text style={[styles.meta, { color: colors.textMuted }]}>{product.category || 'No category'}</Text>
+            <Text style={[styles.price, { color: colors.primary }]}>{Number(product.price || 0).toFixed(2)} EUR</Text>
+
+            <View style={[styles.row, { gap: spacing.xs, marginTop: spacing.xs }]}> 
+              <View style={styles.buttonSlot}>
+                <Link href={{ pathname: '/(app)/client/product/[id]', params: { id: product.$id } }} asChild>
+                  <Pressable
+                    style={[
+                      styles.secondaryBtn,
+                      {
+                        borderRadius: radius.md,
+                        borderColor: colors.borderStrong,
+                        backgroundColor: colors.surfaceSoft,
+                        paddingVertical: spacing.sm
+                      }
+                    ]}
+                  >
+                    <Text style={[styles.secondaryBtnText, { color: colors.textMuted }]}>Details</Text>
+                  </Pressable>
+                </Link>
+              </View>
+              <View style={styles.buttonSlot}>
+                <AppButton
+                  title="Add"
+                  onPress={() => addToCart(product, 1)}
+                  disabled={product.stock <= 0}
+                  style={styles.fullBtn}
+                />
+              </View>
             </View>
           </View>
         ))}
@@ -85,45 +164,43 @@ export default function CatalogScreen() {
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: '#f5f7fb' },
-  content: { padding: 16, gap: 12 },
-  loaderBox: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#f5f7fb' },
-  title: { fontSize: 24, fontWeight: '700', color: '#10213a' },
-  error: { color: '#b42318' },
-  filterRow: { gap: 8, paddingVertical: 4 },
-  pill: { borderWidth: 1, borderColor: '#c9d6ea', borderRadius: 999, paddingHorizontal: 12, paddingVertical: 6 },
-  pillActive: { backgroundColor: '#1f6feb', borderColor: '#1f6feb' },
-  pillText: { color: '#42526b', fontWeight: '600' },
-  pillTextActive: { color: '#fff' },
-  list: { gap: 10 },
+  screen: { flex: 1 },
+  content: {},
+  hero: {
+    borderWidth: 1,
+    marginBottom: 2
+  },
+  loaderBox: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 8 },
+  loaderText: { fontWeight: '600' },
+  title: { fontWeight: '800', letterSpacing: -0.3 },
+  subtitle: { fontSize: 13 },
+  error: { fontWeight: '600' },
+  filterRow: { paddingVertical: 4 },
+  pill: { borderWidth: 1 },
+  pillText: { fontWeight: '700' },
+  list: {},
+  emptyCard: { borderWidth: 1, alignItems: 'center', gap: 2 },
+  emptyTitle: { fontWeight: '700' },
+  emptyText: { fontSize: 12 },
   card: {
-    backgroundColor: '#fff',
     borderWidth: 1,
-    borderColor: '#dbe4f4',
-    borderRadius: 12,
-    padding: 12,
-    gap: 4
+    shadowColor: '#18273b',
+    shadowOpacity: 0.07,
+    shadowOffset: { width: 0, height: 8 },
+    shadowRadius: 16,
+    elevation: 2
   },
-  productName: { fontSize: 16, fontWeight: '700', color: '#10213a' },
-  meta: { color: '#576a86', fontSize: 12 },
-  price: { color: '#1f6feb', fontSize: 16, fontWeight: '700', marginTop: 4 },
-  row: { flexDirection: 'row', gap: 8, marginTop: 8 },
+  productHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
+  stockBadge: { borderWidth: 1, paddingHorizontal: 8, paddingVertical: 3 },
+  productName: { fontSize: 16, fontWeight: '800', flex: 1 },
+  meta: { fontSize: 12 },
+  price: { fontSize: 18, fontWeight: '800', marginTop: 4 },
+  row: { flexDirection: 'row' },
+  buttonSlot: { flex: 1 },
+  fullBtn: { width: '100%' },
   secondaryBtn: {
-    flex: 1,
     borderWidth: 1,
-    borderColor: '#c9d6ea',
-    borderRadius: 10,
-    alignItems: 'center',
-    paddingVertical: 10
+    alignItems: 'center'
   },
-  secondaryBtnText: { color: '#42526b', fontWeight: '600' },
-  primaryBtn: {
-    flex: 1,
-    borderRadius: 10,
-    alignItems: 'center',
-    paddingVertical: 10,
-    backgroundColor: '#1f6feb'
-  },
-  primaryBtnText: { color: '#fff', fontWeight: '700' },
-  btnDisabled: { backgroundColor: '#90b4f5' }
+  secondaryBtnText: { fontWeight: '700' }
 })

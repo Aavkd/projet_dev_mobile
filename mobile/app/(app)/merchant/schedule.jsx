@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react'
-import { Pressable, ScrollView, StyleSheet, Switch, Text, TextInput, View } from 'react-native'
+import { ScrollView, StyleSheet, Switch, Text, View } from 'react-native'
+import AppButton from '../../../src/components/ui/AppButton'
+import AppInput from '../../../src/components/ui/AppInput'
 import { useAuth } from '../../../src/contexts/AuthContext'
+import { useTheme } from '../../../src/theme/ThemeProvider'
 import { scheduleService } from '../../../src/services/scheduleService'
 
 const DAYS = [
@@ -15,6 +18,7 @@ const DAYS = [
 
 export default function MerchantScheduleScreen() {
   const { user } = useAuth()
+  const { colors, radius, spacing, typography } = useTheme()
   const [schedule, setSchedule] = useState({})
   const [saving, setSaving] = useState(false)
 
@@ -75,75 +79,74 @@ export default function MerchantScheduleScreen() {
   }
 
   return (
-    <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
-      <Text style={styles.title}>Opening hours</Text>
+    <ScrollView style={[styles.screen, { backgroundColor: colors.background }]} contentContainerStyle={[styles.content, { padding: spacing.md, gap: spacing.sm }]}> 
+      <View style={[styles.hero, { borderRadius: radius.lg, borderColor: colors.border, backgroundColor: colors.primarySoft, padding: spacing.md }]}> 
+        <Text style={[styles.title, { color: colors.text, fontSize: typography.titleM }]}>Opening hours</Text>
+        <Text style={[styles.heroMeta, { color: colors.textMuted }]}>Set when customers can pick up their orders.</Text>
+      </View>
 
       {DAYS.map((day) => {
         const value = schedule[day.id] || { open_time: '09:00', close_time: '18:00', is_closed: false }
 
         return (
-          <View key={day.id} style={styles.card}>
-            <Text style={styles.dayName}>{day.name}</Text>
+          <View key={day.id} style={[styles.card, { borderRadius: radius.lg, borderColor: colors.border, backgroundColor: colors.surface, padding: spacing.sm, gap: spacing.xs }]}> 
+            <Text style={[styles.dayName, { color: colors.text }]}>{day.name}</Text>
 
             <View style={styles.row}>
-              <Text style={styles.meta}>Closed</Text>
-              <Switch value={value.is_closed} onValueChange={(next) => updateDay(day.id, 'is_closed', next)} />
+              <Text style={[styles.meta, { color: colors.textMuted }]}>Closed</Text>
+              <Switch
+                value={value.is_closed}
+                onValueChange={(next) => updateDay(day.id, 'is_closed', next)}
+                thumbColor={value.is_closed ? colors.primary : '#f0f4fb'}
+                trackColor={{ false: '#c8d6ea', true: '#9fc0ff' }}
+              />
             </View>
 
-            <View style={styles.rowGap}>
-              <TextInput
-                style={[styles.input, value.is_closed && styles.inputDisabled]}
+            <View style={[styles.rowGap, { gap: spacing.xs }]}> 
+              <View style={styles.fieldWrap}>
+                <AppInput
                 value={value.open_time}
                 onChangeText={(next) => updateDay(day.id, 'open_time', next)}
                 editable={!value.is_closed}
                 placeholder="09:00"
-              />
-              <TextInput
-                style={[styles.input, value.is_closed && styles.inputDisabled]}
+                />
+              </View>
+              <View style={styles.fieldWrap}>
+                <AppInput
                 value={value.close_time}
                 onChangeText={(next) => updateDay(day.id, 'close_time', next)}
                 editable={!value.is_closed}
                 placeholder="18:00"
-              />
+                />
+              </View>
             </View>
           </View>
         )
       })}
 
-      <Pressable style={[styles.primaryBtn, saving && styles.btnDisabled]} onPress={save} disabled={saving}>
-        <Text style={styles.primaryBtnText}>{saving ? 'Saving...' : 'Save schedule'}</Text>
-      </Pressable>
+      <AppButton title={saving ? 'Saving...' : 'Save schedule'} onPress={save} disabled={saving} style={styles.fullBtn} />
     </ScrollView>
   )
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: '#f5f7fb' },
-  content: { padding: 16, gap: 10 },
-  title: { fontSize: 24, fontWeight: '700', color: '#10213a' },
+  screen: { flex: 1 },
+  content: {},
+  hero: { borderWidth: 1 },
+  title: { fontWeight: '800', letterSpacing: -0.3 },
+  heroMeta: { fontSize: 13 },
   card: {
-    backgroundColor: '#fff',
     borderWidth: 1,
-    borderColor: '#dbe4f4',
-    borderRadius: 12,
-    padding: 12,
-    gap: 8
+    shadowColor: '#18273b',
+    shadowOpacity: 0.05,
+    shadowOffset: { width: 0, height: 6 },
+    shadowRadius: 14,
+    elevation: 2
   },
-  dayName: { color: '#10213a', fontWeight: '700' },
-  meta: { color: '#576a86' },
+  dayName: { fontWeight: '700' },
+  meta: { fontSize: 13 },
   row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  rowGap: { flexDirection: 'row', gap: 8 },
-  input: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: '#c9d6ea',
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    backgroundColor: '#fbfdff'
-  },
-  inputDisabled: { backgroundColor: '#edf1fa', color: '#93a0b5' },
-  primaryBtn: { borderRadius: 10, backgroundColor: '#1f6feb', alignItems: 'center', paddingVertical: 12 },
-  primaryBtnText: { color: '#fff', fontWeight: '700' },
-  btnDisabled: { backgroundColor: '#90b4f5' }
+  rowGap: { flexDirection: 'row' },
+  fieldWrap: { flex: 1 },
+  fullBtn: { width: '100%' }
 })
